@@ -1,6 +1,6 @@
-# quote-otd — TDD Build Plan
+# quote-otd
 
-Mindfulness quote-of-the-day REST API, built one TDD cycle at a time (Red → Green → Refactor per step).
+Mindfulness quote-of-the-day REST API
 
 ## Versions / Requirements
 - Spring Boot `4.1.1`, Java 21, Gradle 9.8.1 wrapper
@@ -83,6 +83,5 @@ WHERE viewer_id = :viewer
 | **6** | Endpoints: `POST /api/viewers/{id}/quotes/next`, `GET /api/viewers/{id}/history` | MockMvc tests |
 | **7** | README (run/test instructions, Swagger URL), prune-after-insert wiring, error handling polish | final test pass |
 
-**Progress:** Step 0 complete ✅. Step 1 complete ✅ (`V1__init.sql` migration, schema test green, shared `AbstractIntegrationTest` base class). Step 2 next.
+Stop at each step, so I can review the code and tests before moving on. Each step should be fully green before proceeding to the next.
 
-**Process rule:** one TDD cycle per reply, stop after each phase (Red / Green / Refactor) for feedback.
