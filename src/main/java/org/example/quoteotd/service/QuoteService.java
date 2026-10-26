@@ -3,6 +3,8 @@ package org.example.quoteotd.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
 import org.example.quoteotd.dto.QuoteRequest;
 import org.example.quoteotd.dto.QuoteResponse;
 import org.example.quoteotd.model.Quote;
@@ -11,13 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class QuoteService {
 
     private final QuoteRepository quoteRepository;
-
-    public QuoteService(QuoteRepository quoteRepository) {
-        this.quoteRepository = quoteRepository;
-    }
 
     @Transactional(readOnly = true)
     public Optional<QuoteResponse> findById(UUID id) {

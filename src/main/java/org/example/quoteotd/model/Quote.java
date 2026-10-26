@@ -8,11 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "quote")
 @Getter
+@NoArgsConstructor
 public class Quote {
 
     @Id
@@ -22,9 +24,6 @@ public class Quote {
     @Setter
     @Column(nullable = false, unique = true)
     private String text;
-
-    protected Quote() {
-    }
 
     public Quote(String text) {
         this.text = text;
