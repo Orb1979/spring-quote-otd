@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "quote")
@@ -18,6 +19,7 @@ public class Quote {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String text;
 
@@ -33,7 +35,4 @@ public class Quote {
         this.text = text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
 }
