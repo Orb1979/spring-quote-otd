@@ -14,7 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,7 +38,7 @@ class ViewerControllerTest {
 		UUID id = UUID.randomUUID();
 		ViewerResponse viewer = new ViewerResponse(id, "Alice");
 
-		given(viewerService.findById(id)).willReturn(Optional.of(viewer));
+		when(viewerService.findById(id)).thenReturn(Optional.of(viewer));
 
 		mockMvc.perform(get("/api/viewers/{id}", id))
 				.andExpect(status().isOk())
@@ -51,7 +51,7 @@ class ViewerControllerTest {
 	void shouldReturnNotFound_whenViewerDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(viewerService.findById(id)).willReturn(Optional.empty());
+		when(viewerService.findById(id)).thenReturn(Optional.empty());
 
 		mockMvc.perform(get("/api/viewers/{id}", id))
 				.andExpect(status().isNotFound());
@@ -62,7 +62,7 @@ class ViewerControllerTest {
 		ViewerResponse first = new ViewerResponse(UUID.randomUUID(), "Alice");
 		ViewerResponse second = new ViewerResponse(UUID.randomUUID(), "Bob");
 
-		given(viewerService.findAll()).willReturn(List.of(first, second));
+		when(viewerService.findAll()).thenReturn(List.of(first, second));
 
 		mockMvc.perform(get("/api/viewers"))
 				.andExpect(status().isOk())
@@ -76,7 +76,7 @@ class ViewerControllerTest {
 	void shouldReturnCreatedWithLocation_whenViewerIsCreated() throws Exception {
 		ViewerResponse created = new ViewerResponse(UUID.randomUUID(), "Alice");
 
-		given(viewerService.create(new ViewerRequest("Alice"))).willReturn(created);
+		when(viewerService.create(new ViewerRequest("Alice"))).thenReturn(created);
 
 		mockMvc.perform(post("/api/viewers")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class ViewerControllerTest {
 		UUID id = UUID.randomUUID();
 		ViewerResponse updated = new ViewerResponse(id, "Alicia");
 
-		given(viewerService.update(id, new ViewerRequest("Alicia"))).willReturn(Optional.of(updated));
+		when(viewerService.update(id, new ViewerRequest("Alicia"))).thenReturn(Optional.of(updated));
 
 		mockMvc.perform(put("/api/viewers/{id}", id)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class ViewerControllerTest {
 	void shouldReturnNotFound_whenUpdatedViewerDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(viewerService.update(id, new ViewerRequest("Alicia"))).willReturn(Optional.empty());
+		when(viewerService.update(id, new ViewerRequest("Alicia"))).thenReturn(Optional.empty());
 
 		mockMvc.perform(put("/api/viewers/{id}", id)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ class ViewerControllerTest {
 	void shouldReturnNoContent_whenViewerIsDeleted() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(viewerService.deleteById(id)).willReturn(true);
+		when(viewerService.deleteById(id)).thenReturn(true);
 
 		mockMvc.perform(delete("/api/viewers/{id}", id))
 				.andExpect(status().isNoContent());
@@ -128,7 +128,7 @@ class ViewerControllerTest {
 	void shouldReturnNotFound_whenDeletedViewerDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(viewerService.deleteById(id)).willReturn(false);
+		when(viewerService.deleteById(id)).thenReturn(false);
 
 		mockMvc.perform(delete("/api/viewers/{id}", id))
 				.andExpect(status().isNotFound());

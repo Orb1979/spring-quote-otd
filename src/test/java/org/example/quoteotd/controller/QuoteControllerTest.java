@@ -14,7 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,7 +37,7 @@ class QuoteControllerTest {
 	void shouldReturnNotFound_whenQuoteDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(quoteService.findById(id)).willReturn(Optional.empty());
+		when(quoteService.findById(id)).thenReturn(Optional.empty());
 
 		mockMvc.perform(get("/api/quotes/{id}", id))
 				.andExpect(status().isNotFound());
@@ -48,7 +48,7 @@ class QuoteControllerTest {
 		UUID id = UUID.randomUUID();
 		QuoteResponse quote = new QuoteResponse(id, "Breathe in, breathe out.");
 
-		given(quoteService.findById(id)).willReturn(Optional.of(quote));
+		when(quoteService.findById(id)).thenReturn(Optional.of(quote));
 
 		mockMvc.perform(get("/api/quotes/{id}", id))
 				.andExpect(status().isOk())
@@ -62,7 +62,7 @@ class QuoteControllerTest {
 		QuoteResponse first = new QuoteResponse(UUID.randomUUID(), "Breathe in, breathe out.");
 		QuoteResponse second = new QuoteResponse(UUID.randomUUID(), "Be here now.");
 
-		given(quoteService.findAll()).willReturn(List.of(first, second));
+		when(quoteService.findAll()).thenReturn(List.of(first, second));
 
 		mockMvc.perform(get("/api/quotes"))
 				.andExpect(status().isOk())
@@ -76,7 +76,7 @@ class QuoteControllerTest {
 	void shouldReturnCreatedWithLocation_whenQuoteIsCreated() throws Exception {
 		QuoteResponse created = new QuoteResponse(UUID.randomUUID(), "Breathe in, breathe out.");
 
-		given(quoteService.create(new QuoteRequest("Breathe in, breathe out."))).willReturn(created);
+		when(quoteService.create(new QuoteRequest("Breathe in, breathe out."))).thenReturn(created);
 
 		mockMvc.perform(post("/api/quotes")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class QuoteControllerTest {
 		UUID id = UUID.randomUUID();
 		QuoteResponse updated = new QuoteResponse(id, "Be here now.");
 
-		given(quoteService.update(id, new QuoteRequest("Be here now."))).willReturn(Optional.of(updated));
+		when(quoteService.update(id, new QuoteRequest("Be here now."))).thenReturn(Optional.of(updated));
 
 		mockMvc.perform(put("/api/quotes/{id}", id)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class QuoteControllerTest {
 	void shouldReturnNotFound_whenUpdatedQuoteDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(quoteService.update(id, new QuoteRequest("Be here now."))).willReturn(Optional.empty());
+		when(quoteService.update(id, new QuoteRequest("Be here now."))).thenReturn(Optional.empty());
 
 		mockMvc.perform(put("/api/quotes/{id}", id)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ class QuoteControllerTest {
 	void shouldReturnNoContent_whenQuoteIsDeleted() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(quoteService.deleteById(id)).willReturn(true);
+		when(quoteService.deleteById(id)).thenReturn(true);
 
 		mockMvc.perform(delete("/api/quotes/{id}", id))
 				.andExpect(status().isNoContent());
@@ -128,7 +128,7 @@ class QuoteControllerTest {
 	void shouldReturnNotFound_whenDeletedQuoteDoesNotExist() throws Exception {
 		UUID id = UUID.randomUUID();
 
-		given(quoteService.deleteById(id)).willReturn(false);
+		when(quoteService.deleteById(id)).thenReturn(false);
 
 		mockMvc.perform(delete("/api/quotes/{id}", id))
 				.andExpect(status().isNotFound());
