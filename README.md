@@ -74,6 +74,30 @@ curl localhost:8080/api/viewers/<viewerId>/history
 - Concurrent "next" requests for the same viewer are serialized with a
   pessimistic lock on the viewer row.
 
+## Why the entities have no JPA relationships
+
+`QuoteHistory` references viewers and quotes by plain `UUID` columns instead of
+`@ManyToOne` associations — on purpose:
+
+- **The code never navigates the relationship.**
+  JPA associations should only exist for object navigation. \
+  Something like this is never needed (`history.getQuote()`). 
+  The algorithm works entirely with IDs: 
+  - repository queries return quote IDs, 
+  - eligibility filtering compares IDs, 
+  - the quote text is already accessible from the loaded list.  
+- **Integrity lives in the database, where it is strongest.**
+- **It avoids the classic JPA tax:** lazy-loading exceptions
+  - N+1 queries from accidental traversal
+  - The awkward derived-identity pattern required to map `@ManyToOne` through the composite key `(viewer_id, quote_id, cycle)`.
+- **`quote_history` is a domain record, not a link table.** 
+  - It documents what was shown, when, and in which round, with its own identity and lifecycle,
+    inserted and pruned by the algorithm. 
+  - It would be a link table if it  would only have the keys viewer_id, quote_id and no information of its own
+
+If a future feature truly needs navigation, adding an association — or a join
+projection query — remains an additive change.
+
 ## Configuration
 
 `application.properties` connects to the compose database

@@ -38,3 +38,36 @@ public interface QuoteHistoryRepository extends JpaRepository<QuoteHistory, Quot
 	int pruneHistory(@Param("viewerId") UUID viewerId, @Param("currentCycle") int currentCycle,
 			@Param("maxSequence") int maxSequence);
 }
+
+	/*
+	JPA derived method:
+	Optional<QuoteHistory> findFirstByIdViewerIdOrderBySequenceDesc(UUID viewerId);
+
+	Would be the same as this raw SQL query:
+
+	@Query(value = """
+    SELECT *
+    FROM quote_history
+    WHERE viewer_id = :viewerId
+    ORDER BY sequence DESC
+    LIMIT 1
+    """, nativeQuery = true)
+	Optional<QuoteHistory> findFirstByIdViewerIdOrderBySequenceDesc(@Param("viewerId") UUID viewerId);
+
+  Or this JPQL version:
+
+	@Query("""
+    SELECT h
+    FROM QuoteHistory h
+    WHERE h.id.viewerId = :viewerId
+    ORDER BY h.sequence DESC
+    """)
+	List<QuoteHistory> findHistoryForViewer(
+			@Param("viewerId") UUID viewerId,
+			Pageable pageable);
+
+	it needs a Pageable to limit the results, JPQL is designed to work across different databases
+	and SQL’s LIMIT 1 isn’t part of the JPQL language.
+  A derived method can still limit results because Spring recognizes First in its method name and tells
+  JPA to return at most one result. That limit is applied separately from the query text.
+  */
