@@ -35,24 +35,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class NextQuoteServiceTest {
 
-	@Mock
-	private QuoteRepository quoteRepository;
-
-	@Mock
-	private QuoteHistoryRepository quoteHistoryRepository;
-
-	@Mock
-	private ViewerRepository viewerRepository;
-
-	@Mock
-	private java.util.Random random;
+	@Mock private QuoteRepository quoteRepository;
+	@Mock private QuoteHistoryRepository quoteHistoryRepository;
+	@Mock private ViewerRepository viewerRepository;
+	@Mock private java.util.Random random;
 
 	private static final QuoteProperties PROPERTIES = new QuoteProperties(50);
-
 	private static final Instant SHOWN_AT = Instant.parse("2026-10-26T12:00:00Z");
 
 	private NextQuoteService nextQuoteService;
-
 	private UUID viewerId;
 
 	@BeforeEach
@@ -180,6 +171,27 @@ class NextQuoteServiceTest {
 
 		// K = 1 for n = 2, but pruning must always use K_MAX = 50: bound is 101 - 50 = 51, not 101 - 1 = 100
 		verify(quoteHistoryRepository).pruneHistory(viewerId, 3, 51);
+	}
+
+	@Test
+	void shouldFailFast_whenNoQuoteIsEligible() {
+		// Unreachable with consistent data: K < N always holds, and the last-K window
+		// always overlaps the current cycle's rows, so something is always eligible.
+		// Fires only on a broken K formula or inconsistent history data — fail loudly
+		// here rather than crash in random.nextInt(0).
+		Quote first = new Quote(UUID.randomUUID(), "Breathe in, breathe out.");
+		Quote second = new Quote(UUID.randomUUID(), "Be here now.");
+
+		when(viewerRepository.lockById(viewerId)).thenReturn(Optional.of(new Viewer(viewerId, "Alice")));
+		when(quoteRepository.findAll()).thenReturn(List.of(first, second));
+		when(quoteHistoryRepository.findFirstByIdViewerIdOrderBySequenceDesc(viewerId)).thenReturn(Optional.empty());
+		when(quoteHistoryRepository.findQuoteIdsInCycle(viewerId, 1)).thenReturn(List.of(first.getId()));
+		when(quoteHistoryRepository.findRecentQuoteIds(eq(viewerId), any(PageRequest.class)))
+				.thenReturn(List.of(second.getId()));
+
+		assertThatThrownBy(() -> nextQuoteService.nextQuote(viewerId))
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(viewerId.toString());
 	}
 
 	private QuoteHistory captureSavedHistory() {
