@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17
-    container_name: postgres-db
+    container_name: postgres-quote-db
     restart: unless-stopped
 
     environment:
