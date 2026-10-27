@@ -16,6 +16,9 @@ public interface QuoteHistoryRepository extends JpaRepository<QuoteHistory, Quot
 	/** The viewer's most recent row overall (highest sequence, across all cycles). */
 	Optional<QuoteHistory> findFirstByIdViewerIdOrderBySequenceDesc(UUID viewerId);
 
+	/** The viewer's full history, newest first (backed by idx_quote_history_recent). */
+	List<QuoteHistory> findAllByIdViewerIdOrderBySequenceDesc(UUID viewerId);
+
 	/** Quote ids the viewer has already seen in the given cycle. */
 	@Query("select h.id.quoteId from QuoteHistory h where h.id.viewerId = :viewerId and h.id.cycle = :cycle")
 	List<UUID> findQuoteIdsInCycle(@Param("viewerId") UUID viewerId, @Param("cycle") int cycle);
